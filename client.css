@@ -82,3 +82,36 @@ button[type="submit"]:hover {
 .error-text {
     color: red;
 }
+
+button {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+}
+
+.tab {
+    padding: 10px 20px;
+    background-color: #ccc;
+    border: 1px solid #aaa;
+    border-radius: 5px 5px 0 0;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background-color: #ddd;
+}
+
+.panel {
+    display: none;
+    border: 1px solid #aaa;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 0 0 5px 5px;
+}

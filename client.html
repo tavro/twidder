@@ -4,7 +4,20 @@
         <script src="client.js" type="text/javascript"></script>
         <script src="serverstub.js" type="text/javascript"></script>
         <script type=”text/view” id="profileview">
-            <h1>PROFILE VIEW</h1>
+            <div class="tabs">
+                <button class="tab" onclick="showPanel('home')">Home</button>
+                <button class="tab" onclick="showPanel('browse')">Browse</button>
+                <button class="tab" onclick="showPanel('account')">Account</button>
+            </div>
+            <div id="home-wrapper" class="panel">
+                <p>This is the Home panel content.</p>
+            </div>
+            <div id="browse-wrapper" class="panel">
+                <p>This is the Browse panel content.</p>
+            </div>
+            <div id="account-wrapper" class="panel">
+                <p>This is the Account panel content.</p>
+            </div>
         </script>
         <script type=”text/view” id="welcomeview">
             <div class="welcome-wrapper">

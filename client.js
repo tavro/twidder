@@ -51,6 +51,7 @@ window.addEventListener('load', function () {
     } else {
         displayView('welcomeview');
     }
+    showPanel('home'); // TODO: keep track of open tab
 });
 
 function validateForm(formId) {
@@ -74,4 +75,16 @@ function validateForm(formId) {
     }
 
     return isValid;
+}
+
+function showPanel(panelId) {
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(panel => {
+        panel.style.display = 'none';
+    });
+
+    const selectedPanel = document.getElementById(panelId + '-wrapper');
+    if (selectedPanel) {
+        selectedPanel.style.display = 'block';
+    }
 }
