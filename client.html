@@ -12,7 +12,7 @@
                 <div class="forms-wrapper">
                     <div class="login-wrapper">
                         <h1 id="login-header">Login</h1>
-                        <form method="post">
+                        <form id="login-form" method="post">
                             <label for="email">Email</label>
                             <input type="email" id="email" name="email" required>
                             <br>
@@ -23,10 +23,11 @@
                     
                             <button type="submit">Login</button>
                         </form>
+                        <p class="error-text" id="login-error"></p>
                     </div>
                     <div class="signup-wrapper">
                         <h1 id="signup-header">Sign up</h1>
-                        <form method="post">
+                        <form id="signup-form" method="post">
                             <label for="first_name">First Name:</label>
                             <input type="text" id="first_name" name="first_name" required>
                             <br>
@@ -67,15 +68,10 @@
                     
                             <button type="submit">Sign Up</button>
                         </form>
+                        <p class="error-text" id="signup-error"></p>
                     </div>
                 </div>
             </div>
-        </script>
-        <script type="text/javascript">
-            window.addEventListener('load', function() {
-                var welcomeViewContent = document.getElementById('welcomeview').innerHTML;
-                document.body.innerHTML = welcomeViewContent;
-            });
         </script>
     </head>
     <body>
