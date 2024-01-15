@@ -1,0 +1,80 @@
+body {
+    background-color: lightskyblue;
+}
+
+.welcome-wrapper {
+    width: 600px;
+    height: 400px;
+    padding: 0;
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.logo-wrapper {
+    width: 340px;
+    height: 100%;
+    padding: 0;
+    background-image: url("wimage.png");
+}
+
+.forms-wrapper {
+    width: 250px;
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.login-wrapper {
+    width: 100%;
+    height: 120px;
+    background-color: red;
+}
+
+.signup-wrapper {
+    width: 100%;
+    height: 270px;
+    background-color: yellow;
+}
+
+label {
+    width: 50%;
+    font-size: 12px;
+    float: left;
+    padding: 0;
+    display: block;
+    margin-bottom: 10px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: 50%;
+    padding: 0;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#signup-header, #login-header {
+    text-align: center;
+    font-size: 16px;
+}
