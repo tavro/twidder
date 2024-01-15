@@ -9,26 +9,27 @@ document.addEventListener('submit', function (e) {
         if(validateForm(e.target.id)) {
             if (e.target.id === 'signup-form') {
                 var dataObject = {
-                    "email": document.getElementById("email2").textContent,
-                    "password": document.getElementById("password2").textContent,
-                    "firstname": document.getElementById("first_name").textContent,
-                    "familyname": document.getElementById("family_name").textContent,
+                    "email": document.getElementById("email2").value,
+                    "password": document.getElementById("password2").value,
+                    "firstname": document.getElementById("first_name").value,
+                    "familyname": document.getElementById("family_name").value,
                     "gender": "unknown",
-                    "city": document.getElementById("city").textContent,
-                    "country": document.getElementById("country").textContent,
+                    "city": document.getElementById("city").value,
+                    "country": document.getElementById("country").value,
                 }
                 var res = serverstub.signUp(dataObject);
                 if(res.success) {
-                    // TODO: Logged in, redirect
+                    serverstub.signIn(document.getElementById("email2").value, document.getElementById("password2").value)
+                    displayView('profileview');
                 }
                 else {
                     document.getElementById("signup-error").textContent = res.message;
                 }
             }
             else {
-                var res = serverstub.signIn(document.getElementById("email").textContent, document.getElementById("password").textContent);
+                var res = serverstub.signIn(document.getElementById("email").value, document.getElementById("password").value);
                 if(res.success) {
-                    // TODO: Logged in, redirect
+                    displayView('profileview');
                 }
                 else {
                     document.getElementById("login-error").textContent = res.message;
@@ -39,7 +40,17 @@ document.addEventListener('submit', function (e) {
 });
 
 window.addEventListener('load', function () {
-    displayView('welcomeview');
+    if (localStorage.getItem('loggedinusers')) {
+        var storedData = JSON.parse(localStorage.getItem('loggedinusers'));
+    
+        if (typeof storedData === 'object' && Object.keys(storedData).length > 0) {
+            displayView('profileview');
+        } else {
+            displayView('welcomeview');
+        }
+    } else {
+        displayView('welcomeview');
+    }
 });
 
 function validateForm(formId) {
