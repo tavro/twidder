@@ -7,7 +7,33 @@ document.addEventListener('submit', function (e) {
     e.preventDefault();
     if (e.target && e.target.id === 'login-form' || e.target && e.target.id === 'signup-form') {
         if(validateForm(e.target.id)) {
-            console.log("working");
+            if (e.target.id === 'signup-form') {
+                var dataObject = {
+                    "email": document.getElementById("email2").textContent,
+                    "password": document.getElementById("password2").textContent,
+                    "firstname": document.getElementById("first_name").textContent,
+                    "familyname": document.getElementById("family_name").textContent,
+                    "gender": "unknown",
+                    "city": document.getElementById("city").textContent,
+                    "country": document.getElementById("country").textContent,
+                }
+                var res = serverstub.signUp(dataObject);
+                if(res.success) {
+                    // TODO: Logged in, redirect
+                }
+                else {
+                    document.getElementById("signup-error").textContent = res.message;
+                }
+            }
+            else {
+                var res = serverstub.signIn(document.getElementById("email").textContent, document.getElementById("password").textContent);
+                if(res.success) {
+                    // TODO: Logged in, redirect
+                }
+                else {
+                    document.getElementById("login-error").textContent = res.message;
+                }
+            }
         }
     }
 });
