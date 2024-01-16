@@ -88,3 +88,34 @@ function showPanel(panelId) {
         selectedPanel.style.display = 'block';
     }
 }
+
+function changePasswordForm(event) {
+    event.preventDefault();
+
+    var currentPassword = document.getElementById("current-password").value;
+    var newPassword = document.getElementById("new-password").value;
+    var confirmPassword = document.getElementById("confirm-password").value;
+
+    if (newPassword !== confirmPassword) {
+        document.getElementById("change-password-error").textContent = "New password and confirm password do not match.";
+        return;
+    }
+
+    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+    var result = serverstub.changePassword(token, currentPassword, newPassword);
+
+    if (!result.success) {
+        document.getElementById("change-password-error").textContent = result.message;
+    }
+}
+
+function logout() {
+    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+    const result = serverstub.signOut(token);
+
+    if (!result.success) {
+        document.getElementById("signout-error").textContent = result.message;
+    } else {
+        displayView('welcomeview');
+    }
+}

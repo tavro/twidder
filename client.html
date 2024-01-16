@@ -16,7 +16,29 @@
                 <p>This is the Browse panel content.</p>
             </div>
             <div id="account-wrapper" class="panel">
-                <p>This is the Account panel content.</p>
+                <div class="container">
+                    <h2>Change Password</h2>
+                    <form method="post" onsubmit="changePasswordForm(event)">
+                        <div class="form-group">
+                            <label for="current-password">Current Password:</label>
+                            <input type="password" id="current-password" name="current-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">New Password:</label>
+                            <input type="password" id="new-password" name="new-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm New Password:</label>
+                            <input type="password" id="confirm-password" name="confirm-password" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Change Password">
+                        </div>
+                    </form>
+                    <p class="error-text" id="change-password-error"></p>
+                    <button onclick="logout()">Sign Out</button>
+                    <p class="error-text" id="signout-error"></p>
+                </div>
             </div>
         </script>
         <script type=”text/view” id="welcomeview">
