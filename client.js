@@ -37,6 +37,18 @@ document.addEventListener('submit', function (e) {
             }
         }
     }
+    else {
+        if(e.target.id === "post-form") {
+            e.preventDefault();
+            var content = document.getElementById('post_content').value;
+            if(content) {
+                var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+                var mail = JSON.parse(localStorage.getItem("loggedinusers"))[token];
+                var res = serverstub.postMessage(token, content, mail);
+                updatePosts();
+            }
+        }
+    }
 });
 
 window.addEventListener('load', function () {
@@ -51,6 +63,8 @@ window.addEventListener('load', function () {
     } else {
         displayView('welcomeview');
     }
+    loadUserData();
+    updatePosts();
     showPanel('home'); // TODO: keep track of open tab
 });
 
@@ -119,3 +133,28 @@ function logout() {
         displayView('welcomeview');
     }
 }
+
+function loadUserData() {
+    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+    const res = serverstub.getUserDataByToken(token);
+
+    document.getElementById("user-info-fname").textContent = res.data.firstname;
+    document.getElementById("user-info-lname").textContent = res.data.familyname;
+    document.getElementById("user-info-city").textContent = res.data.city;
+    document.getElementById("user-info-country").textContent = res.data.country;
+    document.getElementById("user-info-mail").textContent = res.data.email;
+}
+
+function updatePosts() {
+    var postWrapper = document.querySelector('.posts-wrapper');
+    postWrapper.innerHTML = '';
+  
+    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+    var messages = serverstub.getUserMessagesByToken(token);
+    
+    messages.data.forEach(function(message) {
+        var div = document.createElement('div');
+        div.textContent = message.content;
+        postWrapper.appendChild(div);
+    });
+  }

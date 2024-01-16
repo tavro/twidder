@@ -10,7 +10,19 @@
                 <button class="tab" onclick="showPanel('account')">Account</button>
             </div>
             <div id="home-wrapper" class="panel">
-                <p>This is the Home panel content.</p>
+                <div id="user-info-wrapper">
+                    <h1><span id="user-info-fname"></span> <span id="user-info-lname"></span></h1>
+                    <h2 id="user-info-mail"></h2>
+                    <h3><span id="user-info-city"></span>, <span id="user-info-country"></span></h3>
+                </div>
+                <form id="post-form" method="post">
+                    <label for="post_content">Post Content:</label>
+                    <textarea id="post_content" name="post_content" rows="4" cols="50"></textarea><br><br>
+                    <input type="submit" value="Post">
+                </form>
+                <button onclick="updatePosts()">Reload</button>
+                <div class="posts-wrapper"></div>
+                <hr/>
             </div>
             <div id="browse-wrapper" class="panel">
                 <p>This is the Browse panel content.</p>
