@@ -21,3 +21,16 @@
 - [ ] The CSS code shall validate in https://jigsaw.w3.org/css-validator/
 - [x] It is not allowed to use JQuery.
 
+# Lab 2
+
+## Requirements
+
+### Functional
+
+- [ ] All server functions specified in the lab instructions shall work exactly as specified
+
+### Non-Functional
+
+- [ ] The server shall use an SQLite database to store all user data.
+- [ ] The server shall use appropriate HTTP methods for all routes.
+- [ ] All the server-side functions shall return their responses in JSON.
