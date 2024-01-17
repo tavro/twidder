@@ -34,3 +34,20 @@
 - [ ] The server shall use an SQLite database to store all user data.
 - [ ] The server shall use appropriate HTTP methods for all routes.
 - [ ] All the server-side functions shall return their responses in JSON.
+
+### JSON format
+
+Object has to contain following fields:
+
+- success: true/false
+- message: descriptive message about success status
+- data: the actual data
+
+
+### Sending data
+
+Rules:
+
+- Use URL for GET request
+- Use JSON for POST, PUT and DELETE requests
+- Always use HTTP headers for sending token
