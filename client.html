@@ -38,22 +38,22 @@
                         <input type="submit" id="search-button" value="Search">
                     </div>
                 </form>
-                <!--
-                <div id="other-user-info-wrapper">
-                    <p><b><span id="other-user-info-fname"></span> <span id="other-user-info-lname"></span> <span id="other-user-info-mail"></span></b></p>
-                    <p><i><span id="other-user-info-city"></span><span id="other-user-info-country"></span></i></p>
-                </div>
-                <p class="error-text" id="user-error"></p>
-                <form id="other-post-form" method="post">
-                    <textarea id="other-post-content" name="other-post-content" rows="4"></textarea><br><br>
-                    <div class="center">
-                        <button type="submit">Post</button>
+                <div id="search-content-wrapper">
+                    <div id="other-user-info-wrapper">
+                        <p><b><span id="other-user-info-fname"></span> <span id="other-user-info-lname"></span> <span id="other-user-info-mail"></span></b></p>
+                        <p><i><span id="other-user-info-city"></span><span id="other-user-info-country"></span></i></p>
                     </div>
-                </form>
-                <button onclick="updateOtherPosts()">Reload</button>
-                <hr/>
-                <div class="other-posts-wrapper"></div>
-                -->
+                    <form id="other-post-form" method="post">
+                        <textarea id="other-post-content" name="other-post-content" rows="4"></textarea><br><br>
+                        <div class="center">
+                            <button type="submit">Post</button>
+                        </div>
+                    </form>
+                    <button onclick="updateOtherPosts()">Reload</button>
+                    <hr/>
+                    <div class="other-posts-wrapper"></div>
+                </div>
+                <p class="error-text" id="search-error"></p>
             </div>
             <div id="account-wrapper" class="panel">
                 <div class="container">

@@ -3,6 +3,7 @@ function displayView(viewId) {
     document.body.innerHTML = viewContent;
 }
 
+var activeUser = "";
 document.addEventListener('submit', function (e) {
     e.preventDefault();
     if (e.target && e.target.id === 'login-form' || e.target && e.target.id === 'signup-form') {
@@ -46,6 +47,33 @@ document.addEventListener('submit', function (e) {
                 var mail = JSON.parse(localStorage.getItem("loggedinusers"))[token];
                 var res = serverstub.postMessage(token, content, mail);
                 updatePosts();
+            }
+        }
+        else if(e.target.id === "other-post-form") {
+            e.preventDefault();
+            var content = document.getElementById('other-post-content').value;
+            if(content) {
+                var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+                var res = serverstub.postMessage(token, content, activeUser);
+                updateOtherPosts();
+            }
+        }
+        else if(e.target.id === 'search-form') {
+            e.preventDefault();
+
+            var email = document.getElementById('search-field').value;
+            var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+        
+            var res = serverstub.getUserDataByEmail(token, email);
+        
+            if (res.success) {
+                activeUser = email;
+                document.getElementById('search-content-wrapper').style.display = "block";
+                document.getElementById("search-error").textContent = "";
+                displayOtherUserData(res.data);
+            } else {
+                document.getElementById('search-content-wrapper').style.display = "none";
+                document.getElementById("search-error").textContent = res.message;
             }
         }
     }
@@ -151,6 +179,14 @@ function loadUserData() {
     document.getElementById("user-info-mail").textContent = "(" + res.data.email + ")";
 }
 
+function displayOtherUserData(data) {
+    document.getElementById("other-user-info-fname").textContent = data.firstname;
+    document.getElementById("other-user-info-lname").textContent = data.familyname;
+    document.getElementById("other-user-info-city").textContent = data.city + ", ";
+    document.getElementById("other-user-info-country").textContent = data.country;
+    document.getElementById("other-user-info-mail").textContent = "(" + data.email + ")";
+}
+
 function updatePosts() {
     var postWrapper = document.querySelector('.posts-wrapper');
     postWrapper.innerHTML = '';
@@ -163,4 +199,26 @@ function updatePosts() {
         div.textContent = message.content;
         postWrapper.appendChild(div);
     });
-  }
+}
+
+function inverse(obj){ 
+    var retobj = {}; 
+    for(var key in obj){ 
+        retobj[obj[key]] = key; 
+    } 
+    return retobj; 
+} 
+
+function updateOtherPosts() {
+    var postWrapper = document.querySelector('.other-posts-wrapper');
+    postWrapper.innerHTML = '';
+
+    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+    var messages = serverstub.getUserMessagesByEmail(token, activeUser).data;
+    
+    messages.forEach(function(message) {
+        var div = document.createElement('div');
+        div.textContent = message.content;
+        postWrapper.appendChild(div);
+    });
+}

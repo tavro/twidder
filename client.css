@@ -170,3 +170,7 @@ button {
 #search-form {
     margin-top: 16px;
 }
+
+#search-content-wrapper {
+    display: none;
+}
