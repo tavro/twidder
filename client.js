@@ -40,7 +40,7 @@ document.addEventListener('submit', function (e) {
     else {
         if(e.target.id === "post-form") {
             e.preventDefault();
-            var content = document.getElementById('post_content').value;
+            var content = document.getElementById('post-content').value;
             if(content) {
                 var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
                 var mail = JSON.parse(localStorage.getItem("loggedinusers"))[token];
@@ -97,6 +97,12 @@ function showPanel(panelId) {
         panel.style.display = 'none';
     });
 
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.classList.remove("active");
+    });
+    document.getElementById(panelId).classList.add('active')
+
     const selectedPanel = document.getElementById(panelId + '-wrapper');
     if (selectedPanel) {
         selectedPanel.style.display = 'block';
@@ -140,9 +146,9 @@ function loadUserData() {
 
     document.getElementById("user-info-fname").textContent = res.data.firstname;
     document.getElementById("user-info-lname").textContent = res.data.familyname;
-    document.getElementById("user-info-city").textContent = res.data.city;
+    document.getElementById("user-info-city").textContent = res.data.city + ", ";
     document.getElementById("user-info-country").textContent = res.data.country;
-    document.getElementById("user-info-mail").textContent = res.data.email;
+    document.getElementById("user-info-mail").textContent = "(" + res.data.email + ")";
 }
 
 function updatePosts() {
