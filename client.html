@@ -33,22 +33,27 @@
             </div>
             <div id="browse-wrapper" class="panel">
                 <form id="search-form" method="post">
-                    <input type="text" id="search" name="search">
-                    <input type="submit" value="Search">
+                    <div class="form-group">
+                        <input type="text" id="search-field" name="search">
+                        <input type="submit" id="search-button" value="Search">
+                    </div>
                 </form>
+                <!--
                 <div id="other-user-info-wrapper">
                     <p><b><span id="other-user-info-fname"></span> <span id="other-user-info-lname"></span> <span id="other-user-info-mail"></span></b></p>
                     <p><i><span id="other-user-info-city"></span><span id="other-user-info-country"></span></i></p>
                 </div>
                 <p class="error-text" id="user-error"></p>
                 <form id="other-post-form" method="post">
-                    <label for="other_post_content">Post Content:</label>
-                    <textarea id="other_post_content" name="post_content" rows="4" cols="50"></textarea><br><br>
-                    <input type="submit" value="Post">
+                    <textarea id="other-post-content" name="other-post-content" rows="4"></textarea><br><br>
+                    <div class="center">
+                        <button type="submit">Post</button>
+                    </div>
                 </form>
                 <button onclick="updateOtherPosts()">Reload</button>
                 <hr/>
                 <div class="other-posts-wrapper"></div>
+                -->
             </div>
             <div id="account-wrapper" class="panel">
                 <div class="container">
