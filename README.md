@@ -6,11 +6,11 @@
 
 - [x] The user shall be able to sign up, sign in and sign out.
 - [x] The user shall be able to view his/her own personal information provided during sign-up, everything excluding the password, once signed in.
-- [ ] The user shall own a message wall which other users and himself/herself can post messages on it
+- [x] The user shall own a message wall which other users and himself/herself can post messages on it
 - [x] The user shall be able to refresh his/her own wall to check for any newly posted messages, without refreshing the rest of content. In other words, the browser's refresh button shall not be used.
-- [ ] The user shall be able to view another user's personal information, everything excluding their password, and message wall by providing his/her email address.
-- [ ] The user shall be able to post a message on another user's message wall.
-- [ ] The user shall be able to refresh another user's message wall to see the newly posted messages, without refreshing the rest of the content.
+- [x] The user shall be able to view another user's personal information, everything excluding their password, and message wall by providing his/her email address.
+- [x] The user shall be able to post a message on another user's message wall.
+- [x] The user shall be able to refresh another user's message wall to see the newly posted messages, without refreshing the rest of the content.
 - [x] The user shall be able to change his/her password while being signed-in.
 
 ### Non-Functional
