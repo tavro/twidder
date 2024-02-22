@@ -21,6 +21,10 @@
 - [ ] The CSS code shall validate in https://jigsaw.w3.org/css-validator/
 - [x] It is not allowed to use JQuery.
 
+### TODO
+
+- [ ] Add the error message overlay
+
 # Lab 2
 
 ## Requirements
@@ -31,9 +35,9 @@
 
 ### Non-Functional
 
-- [ ] The server shall use an SQLite database to store all user data.
-- [ ] The server shall use appropriate HTTP methods for all routes.
-- [ ] All the server-side functions shall return their responses in JSON.
+- [x] The server shall use an SQLite database to store all user data.
+- [x] The server shall use appropriate HTTP methods for all routes.
+- [x] All the server-side functions shall return their responses in JSON.
 
 ### JSON format
 
@@ -43,7 +47,6 @@ Object has to contain following fields:
 - message: descriptive message about success status
 - data: the actual data
 
-
 ### Sending data
 
 Rules:
@@ -51,3 +54,30 @@ Rules:
 - Use URL for GET request
 - Use JSON for POST, PUT and DELETE requests
 - Always use HTTP headers for sending token
+
+### TODO
+
+- [ ] fix TODO-comments
+
+# Lab 3
+
+## Requirements
+
+### Functional
+
+- [ ] Only one valid session at a time
+
+### Non-functional
+
+- [ ] The server and client shall communicate asynchronously.
+- [ ] HTTP and WebSocket are used for implementing one way and two way communications between the client and server.
+- [ ] JSON shall be used as data exchange format.
+
+# Lab 4
+
+## Requirements
+
+- [ ] Using HTTP status codes and upgrading the feedback mechanism
+- [ ] Use of HTML5 for Drag and Drop
+- [ ] Applying Further Security Measures
+- [ ] Third-Party Authentication Using OpenID/OAuth 2.0
