@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, session
 import database_helper
 import secrets
 import hashlib
 
 
 app = Flask(__name__)
+app.secret_key = 'your_very_secret_key_here'
 
 
 @app.route("/")
 def index():
-    return app.send_static_file('client.html')
+    user_logged_in = 'user_logged_in' in session
+    return render_template('index.html', user_logged_in=user_logged_in)
 
 
 def generate_token():
@@ -36,6 +38,7 @@ def sign_in():
     if validate_user_credentials(email, password):
         token = generate_token()
         database_helper.create_token(email, token)
+        session['user_logged_in'] = True
         return jsonify(success=True, message="Signed in successfully", data={'token': token})
     else:
         return jsonify(success=False, message="Invalid username or password"), 401
@@ -44,13 +47,13 @@ def sign_in():
 @app.route('/sign-up', methods=['POST'])
 def sign_up():
     data = request.json
-    email = data.get('Email')
-    password = data.get('Password')
-    firstname = data.get('Firstname')
-    familyname = data.get('Familyname')
-    gender = data.get('Gender')
-    city = data.get('City')
-    country = data.get('Country')
+    email = data.get('email')
+    password = data.get('password')
+    firstname = data.get('first_name')
+    familyname = data.get('family_name')
+    gender = "unknown"
+    city = data.get('city')
+    country = data.get('country')
     
     if not all([email, password, firstname, familyname, gender, city, country]):
         return jsonify(success=False, message="Missing fields"), 400
@@ -58,7 +61,7 @@ def sign_up():
     if database_helper.user_exists(email):
         return jsonify(success=False, message="User already exists"), 409
 
-    # TODO: check if password is at least X characters long
+    # TODO: check if password is at least 8 characters long
 
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     database_helper.create_user(email, hashed_password, firstname, familyname, gender, city, country)
@@ -70,6 +73,7 @@ def sign_out():
     token = request.headers.get('Authorization')
 
     if database_helper.remove_token(token):
+        session.clear()
         return jsonify(success=True, message="Signed out successfully")
     else:
         return jsonify(success=False, message="Invalid token"), 401
