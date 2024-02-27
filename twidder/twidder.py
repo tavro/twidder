@@ -61,7 +61,8 @@ def sign_up():
     if database_helper.user_exists(email):
         return jsonify(success=False, message="User already exists"), 409
 
-    # TODO: check if password is at least 8 characters long
+    if len(password) < 8:
+        return jsonify(success=False, message="Password must be at least 8 characters long"), 400
 
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     database_helper.create_user(email, hashed_password, firstname, familyname, gender, city, country)
@@ -89,7 +90,7 @@ def change_password():
     if not validate_token(token):
         return jsonify(success=False, message="Invalid token"), 401
 
-    email = database_helper.get_email_by_token(token)  # Correctly fetch the email from the token
+    email = database_helper.get_email_by_token(token)
     if email is None:
         return jsonify(success=False, message="Invalid token"), 401
 
@@ -102,7 +103,6 @@ def change_password():
         return jsonify(success=False, message="Incorrect old password"), 400
     
     new_password_hash = hashlib.sha256(new_password.encode()).hexdigest()
-    # TODO: check if password is valid
     
     database_helper.update_password(email, new_password_hash)
     return jsonify(success=True, message="Password changed successfully")

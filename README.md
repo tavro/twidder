@@ -17,8 +17,8 @@
 
 - [x] Once the application is opened for the first time, it will not require to refresh itself during its lifetime. Such applications are called Single Page Applications or SPAs. For more information please check out section: Application Structure.
 - [x] Using “window.alert()” or similar types of window based inputs/outputs is NOT allowed
-- [ ] The HTML code shall validate in https://validator.w3.org/ . The HTML code in the script elements which represent different views shall be validated separately by copying and pasting the code inside the validator.
-- [ ] The CSS code shall validate in https://jigsaw.w3.org/css-validator/
+- [x] The HTML code shall validate in https://validator.w3.org/ . The HTML code in the script elements which represent different views shall be validated separately by copying and pasting the code inside the validator.
+- [x] The CSS code shall validate in https://jigsaw.w3.org/css-validator/
 - [x] It is not allowed to use JQuery.
 
 ### TODO

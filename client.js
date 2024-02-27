@@ -22,6 +22,9 @@ document.addEventListener('submit', function (e) {
                 if(res.success) {
                     serverstub.signIn(document.getElementById("email2").value, document.getElementById("password2").value)
                     displayView('profileview');
+                    loadUserData();
+                    updatePosts();
+                    showPanel('home');
                 }
                 else {
                     document.getElementById("signup-error").textContent = res.message;
@@ -31,6 +34,9 @@ document.addEventListener('submit', function (e) {
                 var res = serverstub.signIn(document.getElementById("email").value, document.getElementById("password").value);
                 if(res.success) {
                     displayView('profileview');
+                    loadUserData();
+                    updatePosts();
+                    showPanel('home');
                 }
                 else {
                     document.getElementById("login-error").textContent = res.message;
@@ -93,7 +99,7 @@ window.addEventListener('load', function () {
     }
     loadUserData();
     updatePosts();
-    showPanel('home'); // TODO: keep track of open tab
+    showPanel('home');
 });
 
 function validateForm(formId) {
@@ -104,15 +110,15 @@ function validateForm(formId) {
     if(formId === "signup-form") {
         var repeatPasswordField = form.querySelector('input[name="repeat_password"]');
         if (passwordField.value !== repeatPasswordField.value) {
-            //document.getElementById("signup-error").textContent = "Passwords do not match.";
+            document.getElementById("signup-error").textContent = "Passwords do not match.";
             isValid = false;
         }
     }
     
     var minLength = 8;
     if (passwordField.value.length < minLength) {
-        //var id = formId === "signup-form" ? "signup-error" : "login-error";
-        //document.getElementById(id).textContent = "Password must be at least " + minLength + " characters long.";
+        var id = formId === "signup-form" ? "signup-error" : "login-error";
+        document.getElementById(id).textContent = "Password must be at least " + minLength + " characters long.";
         isValid = false;
     }
 
@@ -129,7 +135,10 @@ function showPanel(panelId) {
     tabs.forEach(tab => {
         tab.classList.remove("active");
     });
-    document.getElementById(panelId).classList.add('active')
+
+    if(document.getElementById(panelId)) {
+        document.getElementById(panelId).classList.add('active')
+    }
 
     const selectedPanel = document.getElementById(panelId + '-wrapper');
     if (selectedPanel) {
@@ -169,14 +178,15 @@ function logout() {
 }
 
 function loadUserData() {
-    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-    const res = serverstub.getUserDataByToken(token);
-
-    document.getElementById("user-info-fname").textContent = res.data.firstname;
-    document.getElementById("user-info-lname").textContent = res.data.familyname;
-    document.getElementById("user-info-city").textContent = res.data.city + ", ";
-    document.getElementById("user-info-country").textContent = res.data.country;
-    document.getElementById("user-info-mail").textContent = "(" + res.data.email + ")";
+    if(localStorage.getItem("loggedinusers")) {
+        var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+        const res = serverstub.getUserDataByToken(token);
+        document.getElementById("user-info-fname").textContent = res.data.firstname;
+        document.getElementById("user-info-lname").textContent = res.data.familyname;
+        document.getElementById("user-info-city").textContent = res.data.city + ", ";
+        document.getElementById("user-info-country").textContent = res.data.country;
+        document.getElementById("user-info-mail").textContent = "(" + res.data.email + ")";
+    }
 }
 
 function displayOtherUserData(data) {
@@ -189,16 +199,18 @@ function displayOtherUserData(data) {
 
 function updatePosts() {
     var postWrapper = document.querySelector('.posts-wrapper');
-    postWrapper.innerHTML = '';
-  
-    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-    var messages = serverstub.getUserMessagesByToken(token);
+    if(postWrapper) {
+        postWrapper.innerHTML = '';
     
-    messages.data.forEach(function(message) {
-        var div = document.createElement('div');
-        div.textContent = message.content;
-        postWrapper.appendChild(div);
-    });
+        var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+        var messages = serverstub.getUserMessagesByToken(token);
+        
+        messages.data.forEach(function(message) {
+            var div = document.createElement('div');
+            div.textContent = message.content;
+            postWrapper.appendChild(div);
+        });
+    }
 }
 
 function inverse(obj){ 
