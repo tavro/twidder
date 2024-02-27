@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, session
 import database_helper
 import secrets
 import hashlib
+import re
 
 
 app = Flask(__name__)
@@ -49,14 +50,18 @@ def sign_up():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-    firstname = data.get('first_name')
-    familyname = data.get('family_name')
+    firstname = data.get('firstname')
+    familyname = data.get('familyname')
     gender = "unknown"
     city = data.get('city')
     country = data.get('country')
     
     if not all([email, password, firstname, familyname, gender, city, country]):
         return jsonify(success=False, message="Missing fields"), 400
+
+    email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if not re.match(email_regex, email):
+        return jsonify(success=False, message="Invalid email format"), 400
 
     if database_helper.user_exists(email):
         return jsonify(success=False, message="User already exists"), 409
