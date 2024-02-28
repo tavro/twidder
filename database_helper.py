@@ -84,5 +84,5 @@ def get_messages(email):
     cursor.execute("""
     SELECT message FROM messages 
     WHERE recipient_email = ?
-    """, (email))
+    """, (email,))
     return cursor.fetchall()

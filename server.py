@@ -16,7 +16,7 @@ def make_res(status, msg, data="-"):
 @app.route("/")
 def index():
     user_logged_in = 'user_logged_in' in session
-    return render_template('index.html', user_logged_in=user_logged_in)
+    return "test"
 
 
 def generate_token():
@@ -49,6 +49,7 @@ def sign_in():
 
     if validate_user_credentials(email, password):
         token = generate_token()
+        database_helper.create_token(email, token)
         return make_res(True, "Signed in successfully", token)
     else:
         return make_res(False, "Invalid username or password")
