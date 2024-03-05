@@ -1,3 +1,21 @@
+function updateViews() {
+    const welcomeView = document.getElementById('welcomeview');
+    const profileView = document.getElementById('profileview');
+
+    if (localStorage.getItem("token")) {
+        loadUser();
+        welcomeView.style.display = 'none';
+        profileView.style.display = 'block';
+    } else {
+        welcomeView.style.display = 'block';
+        profileView.style.display = 'none';
+    }
+}
+
+window.onload = function () {
+    updateViews();
+};
+
 function displayUserData(data) {
     document.getElementById("user-info-fname").textContent = data.firstname;
     document.getElementById("user-info-lname").textContent = data.familyname;
@@ -83,6 +101,7 @@ function register(event) {
       if (res.success) {
         if(token) {
             localStorage.setItem("token", token);
+            updateViews();
         }
         document.getElementById("signup-error").textContent = res.message;
       } else {
@@ -115,6 +134,7 @@ function login(event) {
         if(token) {
             localStorage.setItem("token", token);
             localStorage.setItem("email", document.getElementById("email").value);
+            updateViews();
         }
         document.getElementById("login-error").textContent = res.message;
       } else {
@@ -168,6 +188,7 @@ function logout() {
       let res = JSON.parse(xhr.responseText);
       if (res.success) {
         localStorage.removeItem("token");
+        updateViews();
       } else {
         document.getElementById("signout-error").textContent = res.message;
       }

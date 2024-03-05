@@ -6,7 +6,6 @@
 </head>
 <body>
     <main>
-        {% if user_logged_in %}
         <div id="profileview">
             <div class="navigation-bar">
                 <div id="home" class="tab" onclick="showPanel('home')">
@@ -86,7 +85,6 @@
                 </div>
             </div>
         </div>
-        {% else %}
         <div id="welcomeview">
             <div class="welcome-wrapper">
                 <div class="logo-wrapper"></div>
@@ -157,8 +155,22 @@
                 </div>
             </div>
         </div>
-        {% endif %}
     </main>
     <script src="/static/client.js"></script>
+    <script>
+        window.onload = function () {
+            const welcomeView = document.getElementById('welcomeview');
+            const profileView = document.getElementById('profileview');
+
+            if (localStorage.getItem("token")) {
+                loadUser();
+                welcomeView.style.display = 'none';
+                profileView.style.display = 'block';
+            } else {
+                welcomeView.style.display = 'block';
+                profileView.style.display = 'none';
+            }
+        };
+    </script>
 </body>
 </html>
