@@ -86,3 +86,11 @@ def get_messages(email):
     WHERE recipient_email = ?
     """, (email,))
     return cursor.fetchall()
+
+
+def get_token_by_email(email):
+    cursor.execute("SELECT token FROM tokens WHERE email = ?", (email,))
+    result = cursor.fetchone()
+    if result:
+        return result[0]
+    return None

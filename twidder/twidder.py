@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session
+from flask_sock import Sock
 import database_helper
 import secrets
 import hashlib
@@ -7,6 +8,18 @@ import re
 
 app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_here'
+
+
+sock = Sock(app)
+socks = {}
+
+
+@sock.route("/sock")
+def check_logout(sock):
+    while True:
+        token = sock.receive()
+        if database_helper.check_token(token):
+            socks[token] = sock
 
 
 def make_res(status, msg, data="-"):
@@ -48,6 +61,14 @@ def sign_in():
     password = request.get_json().get('password')
 
     if validate_user_credentials(email, password):
+        prev_token = database_helper.get_token_by_email(email)
+        if prev_token:
+            database_helper.remove_token(prev_token)
+
+        if socks.get(prev_token):
+            socks[prev_token].send("Log Out")
+            socks.pop(prev_token)
+        
         token = generate_token()
         database_helper.create_token(email, token)
         return make_res(True, "Signed in successfully", token)
@@ -92,6 +113,9 @@ def sign_out():
     token = request.headers.get('Authorization')
     if not validate_token(token):
         return make_res(False, "Invalid token")
+
+    if socks.get(token):
+        socks.pop(token)
 
     if database_helper.remove_token(token):
         session.clear()

@@ -6,6 +6,7 @@ function updateViews() {
         loadUser();
         welcomeView.style.display = 'none';
         profileView.style.display = 'block';
+        initSocket();
     } else {
         welcomeView.style.display = 'block';
         profileView.style.display = 'none';
@@ -30,6 +31,7 @@ function displayOtherUserData(data) {
     document.getElementById("other-user-info-city").textContent = data.city + ", ";
     document.getElementById("other-user-info-country").textContent = data.country;
     document.getElementById("other-user-info-mail").textContent = "(" + data.email + ")";
+    document.getElementById("search-content-wrapper").style.display = 'block';
 }
 
 function updatePosts(data) {
@@ -38,7 +40,7 @@ function updatePosts(data) {
         
     data.forEach(function(obj) {
         var div = document.createElement('div');
-        div.textContent = obj.message;
+        div.textContent = obj;
         postWrapper.appendChild(div);
     });
 }
@@ -49,7 +51,7 @@ function updateOtherPosts(data) {
 
     data.forEach(function(obj) {
         var div = document.createElement('div');
-        div.textContent = obj.message;
+        div.textContent = obj;
         postWrapper.appendChild(div);
     });
 }
@@ -75,7 +77,42 @@ function showPanel(panelId) {
     }
 }
 
-const url = "http://127.0.0.1:5000";
+const base = "127.0.0.1:5000"
+const url = "http://" + base;
+const sock_url = "ws://" + base + "/sock";
+
+let socket;
+function socketLogout() {
+  localStorage.removeItem("token");
+  
+  const welcomeView = document.getElementById('welcomeview');
+  const profileView = document.getElementById('profileview');
+  welcomeView.style.display = 'block';
+  profileView.style.display = 'none';
+  
+  if (socket.readyState == 1) {
+    socket.close();
+  }
+}
+
+function initSocket() {
+  if (!localStorage.getItem("token")) {
+    return;
+  }
+
+  socket = new WebSocket(sock_url);
+  socket.addEventListener("message", (ev) => {
+    if (ev.data === "Log Out") {
+      socketLogout();
+    }
+  });
+
+  socket.onopen = (event) => {
+    if (socket.readyState == 1) {
+      socket.send(localStorage.getItem("token"));
+    }
+  };
+}
 
 function register(event) {
   event.preventDefault();
@@ -103,6 +140,7 @@ function register(event) {
             localStorage.setItem("token", token);
             updateViews();
         }
+        initSocket(); // TODO: Check if working
         document.getElementById("signup-error").textContent = res.message;
       } else {
         document.getElementById("signup-error").textContent = res.message;
@@ -134,8 +172,10 @@ function login(event) {
         if(token) {
             localStorage.setItem("token", token);
             localStorage.setItem("email", document.getElementById("email").value);
+            showPanel('home');
             updateViews();
         }
+        initSocket(); // TODO: Check if working
         document.getElementById("login-error").textContent = res.message;
       } else {
         document.getElementById("login-error").textContent = res.message;
@@ -189,6 +229,9 @@ function logout() {
       if (res.success) {
         localStorage.removeItem("token");
         updateViews();
+        if(socket.readyState == 1) {
+          socket.close();
+        }
       } else {
         document.getElementById("signout-error").textContent = res.message;
       }
@@ -232,7 +275,7 @@ function loadMessages() {
       if (res.success) {
         updatePosts(res.data);
       } else {
-            document.getElementById("post-error").textContent = res.message;
+        document.getElementById("post-error").textContent = res.message;
       }
     }
   };
@@ -254,14 +297,16 @@ function loadOtherMessages() {
       if (res.success) {
         updateOtherPosts(res.data);
       } else {
-            document.getElementById("search-error").textContent = res.message;
+        document.getElementById("search-error").textContent = res.message;
       }
     }
   };
   xhr.send();
 }
 
-function search() {
+function searchUser(event) {
+  event.preventDefault();
+
   let token = localStorage.getItem("token");
   let email = document.getElementById('search-field').value;
 
@@ -283,13 +328,15 @@ function search() {
   xhr.send();
 }
 
-function postMessage() {
+function postMessage(event) {
+  event.preventDefault();
+
   let content = document.getElementById('post-content').value;
   if (content) {
     let email = localStorage.getItem("email");
     let dataObject = {
         email: email,
-        message, content
+        message: content
     }
 
     let token = localStorage.getItem("token");
@@ -313,7 +360,9 @@ function postMessage() {
   }
 }
 
-function postOthersMessage() {
+function postOthersMessage(event) {
+  event.preventDefault();
+
   let token = localStorage.getItem("token");
   let content = document.getElementById('other-post-content').value;
 

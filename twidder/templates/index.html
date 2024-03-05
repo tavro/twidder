@@ -24,7 +24,7 @@
                     <p><b><span id="user-info-fname"></span> <span id="user-info-lname"></span> <span id="user-info-mail"></span></b></p>
                     <p><i><span id="user-info-city"></span><span id="user-info-country"></span></i></p>
                 </div>
-                <form id="post-form" method="post" onsubmit="postMessage()">
+                <form id="post-form" method="post" onsubmit="postMessage(event)">
                     <textarea id="post-content" name="post-content" rows="4"></textarea><br><br>
                     <div class="center">
                         <button type="submit">Post</button>
@@ -36,7 +36,7 @@
                 <p class="error-text" id="post-error"></p>
             </div>
             <div id="browse-wrapper" class="panel">
-                <form id="search-form" method="post" onsubmit="search()">
+                <form id="search-form" method="get" onsubmit="searchUser(event)">
                     <div class="form-group">
                         <input type="text" id="search-field" name="search">
                         <input type="submit" id="search-button" value="Search">
@@ -47,7 +47,7 @@
                         <p><b><span id="other-user-info-fname"></span> <span id="other-user-info-lname"></span> <span id="other-user-info-mail"></span></b></p>
                         <p><i><span id="other-user-info-city"></span><span id="other-user-info-country"></span></i></p>
                     </div>
-                    <form id="other-post-form" method="post" onsubmit="postOthersMessage()">
+                    <form id="other-post-form" method="post" onsubmit="postOthersMessage(event)">
                         <textarea id="other-post-content" name="other-post-content" rows="4"></textarea><br><br>
                         <div class="center">
                             <button type="submit">Post</button>
