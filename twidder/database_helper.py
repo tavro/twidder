@@ -5,6 +5,20 @@ conn = sqlite3.connect('database.db', check_same_thread=False)
 cursor = conn.cursor()
 
 
+def init_db():
+    with open('schema.sql', 'r') as f:
+        sql_script = f.read()
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.executescript(sql_script)
+    conn.commit()
+    conn.close()
+
+
+init_db()
+
+
 def get_user_by_email(email):
     cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
     return cursor.fetchone()
@@ -27,11 +41,16 @@ def user_exists(email):
     cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)", (email,))
     return cursor.fetchone()[0] == 1
 
-
-def create_user(email, hashed_pass, firstname, familyname, gender, city, country):
-    cursor.execute("INSERT INTO users (email, password, firstname, familyname, gender, city, country) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                   (email, hashed_pass, firstname, familyname, gender, city, country))
-    conn.commit()
+def create_user(email, hashed_password, firstname, familyname, gender, city, country):
+    try:
+        cursor.execute("INSERT INTO users (email, password, firstname, familyname, gender, city, country) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (email, hashed_password, firstname, familyname, gender, city, country))
+        conn.commit()
+        return True
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        conn.rollback()
+        return False
 
 
 def remove_token(token):
@@ -65,5 +84,5 @@ def get_messages(email):
     cursor.execute("""
     SELECT message FROM messages 
     WHERE recipient_email = ?
-    """, (email))
+    """, (email,))
     return cursor.fetchall()

@@ -1,128 +1,39 @@
-function displayView(viewId) {
-    var viewContent = document.getElementById(viewId).innerHTML;
-    document.body.innerHTML = viewContent;
+function displayUserData(data) {
+    document.getElementById("user-info-fname").textContent = data.firstname;
+    document.getElementById("user-info-lname").textContent = data.familyname;
+    document.getElementById("user-info-city").textContent = data.city + ", ";
+    document.getElementById("user-info-country").textContent = data.country;
+    document.getElementById("user-info-mail").textContent = "(" + data.email + ")";
 }
 
-var activeUser = "";
-document.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (e.target && e.target.id === 'login-form' || e.target && e.target.id === 'signup-form') {
-        if(validateForm(e.target.id)) {
-            if (e.target.id === 'signup-form') {
-                var dataObject = {
-                    "email": document.getElementById("email2").value,
-                    "password": document.getElementById("password2").value,
-                    "firstname": document.getElementById("first_name").value,
-                    "familyname": document.getElementById("family_name").value,
-                    "gender": "unknown",
-                    "city": document.getElementById("city").value,
-                    "country": document.getElementById("country").value,
-                }
-                var res = serverstub.signUp(dataObject);
-                if(res.success) {
-                    serverstub.signIn(document.getElementById("email2").value, document.getElementById("password2").value)
-                    displayView('profileview');
-                    loadUserData();
-                    updatePosts();
-                    showPanel('home');
-                }
-                else {
-                    document.getElementById("signup-error").textContent = res.message;
-                }
-            }
-            else {
-                var res = serverstub.signIn(document.getElementById("email").value, document.getElementById("password").value);
-                if(res.success) {
-                    displayView('profileview');
-                    loadUserData();
-                    updatePosts();
-                    showPanel('home');
-                }
-                else {
-                    document.getElementById("login-error").textContent = res.message;
-                }
-            }
-        }
-    }
-    else {
-        if(e.target.id === "post-form") {
-            e.preventDefault();
-            var content = document.getElementById('post-content').value;
-            if(content) {
-                var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-                var mail = JSON.parse(localStorage.getItem("loggedinusers"))[token];
-                var res = serverstub.postMessage(token, content, mail);
-                updatePosts();
-            }
-        }
-        else if(e.target.id === "other-post-form") {
-            e.preventDefault();
-            var content = document.getElementById('other-post-content').value;
-            if(content) {
-                var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-                var res = serverstub.postMessage(token, content, activeUser);
-                updateOtherPosts();
-            }
-        }
-        else if(e.target.id === 'search-form') {
-            e.preventDefault();
+function displayOtherUserData(data) {
+    document.getElementById("other-user-info-fname").textContent = data.firstname;
+    document.getElementById("other-user-info-lname").textContent = data.familyname;
+    document.getElementById("other-user-info-city").textContent = data.city + ", ";
+    document.getElementById("other-user-info-country").textContent = data.country;
+    document.getElementById("other-user-info-mail").textContent = "(" + data.email + ")";
+}
 
-            var email = document.getElementById('search-field').value;
-            var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
+function updatePosts(data) {
+    var postWrapper = document.querySelector('.posts-wrapper');
+    postWrapper.innerHTML = '';
         
-            var res = serverstub.getUserDataByEmail(token, email);
-        
-            if (res.success) {
-                activeUser = email;
-                document.getElementById('search-content-wrapper').style.display = "block";
-                document.getElementById("search-error").textContent = "";
-                displayOtherUserData(res.data);
-            } else {
-                document.getElementById('search-content-wrapper').style.display = "none";
-                document.getElementById("search-error").textContent = res.message;
-            }
-        }
-    }
-});
+    data.forEach(function(obj) {
+        var div = document.createElement('div');
+        div.textContent = obj.message;
+        postWrapper.appendChild(div);
+    });
+}
 
-window.addEventListener('load', function () {
-    if (localStorage.getItem('loggedinusers')) {
-        var storedData = JSON.parse(localStorage.getItem('loggedinusers'));
-    
-        if (typeof storedData === 'object' && Object.keys(storedData).length > 0) {
-            displayView('profileview');
-        } else {
-            displayView('welcomeview');
-        }
-    } else {
-        displayView('welcomeview');
-    }
-    loadUserData();
-    updatePosts();
-    showPanel('home');
-});
+function updateOtherPosts(data) {
+    var postWrapper = document.querySelector('.other-posts-wrapper');
+    postWrapper.innerHTML = '';
 
-function validateForm(formId) {
-    var form = document.forms[formId];
-    var isValid = true;
-
-    var passwordField = form.querySelector('input[type="password"]');
-    if(formId === "signup-form") {
-        var repeatPasswordField = form.querySelector('input[name="repeat_password"]');
-        if (passwordField.value !== repeatPasswordField.value) {
-            document.getElementById("signup-error").textContent = "Passwords do not match.";
-            isValid = false;
-        }
-    }
-    
-    var minLength = 8;
-    if (passwordField.value.length < minLength) {
-        var id = formId === "signup-form" ? "signup-error" : "login-error";
-        document.getElementById(id).textContent = "Password must be at least " + minLength + " characters long.";
-        isValid = false;
-    }
-
-    return isValid;
+    data.forEach(function(obj) {
+        var div = document.createElement('div');
+        div.textContent = obj.message;
+        postWrapper.appendChild(div);
+    });
 }
 
 function showPanel(panelId) {
@@ -146,91 +57,268 @@ function showPanel(panelId) {
     }
 }
 
-function changePasswordForm(event) {
-    event.preventDefault();
+const url = "http://127.0.0.1:5000";
 
-    var currentPassword = document.getElementById("current-password").value;
-    var newPassword = document.getElementById("new-password").value;
-    var confirmPassword = document.getElementById("confirm-password").value;
+function register(event) {
+  event.preventDefault();
 
-    if (newPassword !== confirmPassword) {
-        document.getElementById("change-password-error").textContent = "New password and confirm password do not match.";
-        return;
+  let dataObject = {
+    email: document.getElementById("email2").value,
+    password: document.getElementById("password2").value,
+    firstname: document.getElementById("first_name").value,
+    familyname: document.getElementById("family_name").value,
+    gender: "unknown",
+    city: document.getElementById("city").value,
+    country: document.getElementById("country").value,
+  };
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", url + "/sign_up", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      let token = xhr.getResponseHeader("Authorization");
+      if (res.success) {
+        if(token) {
+            localStorage.setItem("token", token);
+        }
+        document.getElementById("signup-error").textContent = res.message;
+      } else {
+        document.getElementById("signup-error").textContent = res.message;
+      }
     }
+  };
 
-    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-    var result = serverstub.changePassword(token, currentPassword, newPassword);
+  let req = JSON.stringify(dataObject);
+  xhr.send(req);
+}
 
-    if (!result.success) {
-        document.getElementById("change-password-error").textContent = result.message;
+function login(event) {
+  event.preventDefault();
+
+  let dataObject = {
+    username: document.getElementById("email").value,
+    password: document.getElementById("password").value,
+  };
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", url + "/sign_in", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      let token = res.data;
+      if (res.success) {
+        if(token) {
+            localStorage.setItem("token", token);
+            localStorage.setItem("email", document.getElementById("email").value);
+        }
+        document.getElementById("login-error").textContent = res.message;
+      } else {
+        document.getElementById("login-error").textContent = res.message;
+      }
     }
+  };
+
+  let req = JSON.stringify(dataObject);
+  xhr.send(req);
+}
+
+function changePassword(event) {
+  event.preventDefault();
+
+  let token = localStorage.getItem("token");
+
+  let dataObject = {
+    oldpassword: document.getElementById("current-password").value,
+    newpassword: document.getElementById("new-password").value
+  }
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("PUT", url + "/change_password", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("Authorization", token);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        document.getElementById("change-password-error").textContent = res.message;
+      } else {
+        document.getElementById("change-password-error").textContent = res.message;
+      }
+    }
+  };
+
+  let req = JSON.stringify(dataObject);
+  xhr.send(req);
 }
 
 function logout() {
-    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-    const result = serverstub.signOut(token);
+  let xhr = new XMLHttpRequest();
+  xhr.open("DELETE", url + "/sign_out", true);
+  let token = localStorage.getItem("token");
+  xhr.setRequestHeader("Authorization", token);
 
-    if (!result.success) {
-        document.getElementById("signout-error").textContent = result.message;
-    } else {
-        displayView('welcomeview');
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        localStorage.removeItem("token");
+      } else {
+        document.getElementById("signout-error").textContent = res.message;
+      }
     }
+  };
+
+  xhr.send();
 }
 
-function loadUserData() {
-    if(localStorage.getItem("loggedinusers")) {
-        var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-        const res = serverstub.getUserDataByToken(token);
-        document.getElementById("user-info-fname").textContent = res.data.firstname;
-        document.getElementById("user-info-lname").textContent = res.data.familyname;
-        document.getElementById("user-info-city").textContent = res.data.city + ", ";
-        document.getElementById("user-info-country").textContent = res.data.country;
-        document.getElementById("user-info-mail").textContent = "(" + res.data.email + ")";
+function loadUser() {
+  let token = localStorage.getItem("token");
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", url + "/get_user_data_by_token", true);
+  xhr.setRequestHeader("Authorization", token);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        displayUserData(res.data);
+      } else {
+            document.getElementById("post-error").textContent = res.message;
+      }
     }
+  };
+
+  xhr.send();
 }
 
-function displayOtherUserData(data) {
-    document.getElementById("other-user-info-fname").textContent = data.firstname;
-    document.getElementById("other-user-info-lname").textContent = data.familyname;
-    document.getElementById("other-user-info-city").textContent = data.city + ", ";
-    document.getElementById("other-user-info-country").textContent = data.country;
-    document.getElementById("other-user-info-mail").textContent = "(" + data.email + ")";
-}
+function loadMessages() {
+  let token = localStorage.getItem("token");
 
-function updatePosts() {
-    var postWrapper = document.querySelector('.posts-wrapper');
-    if(postWrapper) {
-        postWrapper.innerHTML = '';
-    
-        var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-        var messages = serverstub.getUserMessagesByToken(token);
-        
-        messages.data.forEach(function(message) {
-            var div = document.createElement('div');
-            div.textContent = message.content;
-            postWrapper.appendChild(div);
-        });
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", url + "/get_user_messages_by_token", true);
+  xhr.setRequestHeader("Authorization", token);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        updatePosts(res.data);
+      } else {
+            document.getElementById("post-error").textContent = res.message;
+      }
     }
+  };
+
+  xhr.send();
 }
 
-function inverse(obj){ 
-    var retobj = {}; 
-    for(var key in obj){ 
-        retobj[obj[key]] = key; 
-    } 
-    return retobj; 
-} 
+function loadOtherMessages() {
+  let token = localStorage.getItem("token");
+  let email = document.getElementById('search-field').value;
 
-function updateOtherPosts() {
-    var postWrapper = document.querySelector('.other-posts-wrapper');
-    postWrapper.innerHTML = '';
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", url + "/get_user_messages_by_email/" + email, true);
+  xhr.setRequestHeader("Authorization", token);
 
-    var token = Object.keys(JSON.parse(localStorage.getItem("loggedinusers")))[0];
-    var messages = serverstub.getUserMessagesByEmail(token, activeUser).data;
-    
-    messages.forEach(function(message) {
-        var div = document.createElement('div');
-        div.textContent = message.content;
-        postWrapper.appendChild(div);
-    });
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        updateOtherPosts(res.data);
+      } else {
+            document.getElementById("search-error").textContent = res.message;
+      }
+    }
+  };
+  xhr.send();
+}
+
+function search() {
+  let token = localStorage.getItem("token");
+  let email = document.getElementById('search-field').value;
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", url + "/get_user_data_by_email/" + email, true);
+  xhr.setRequestHeader("Authorization", token);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      let res = JSON.parse(xhr.responseText);
+      if (res.success) {
+        displayOtherUserData(res.data);
+      } else {
+        document.getElementById("search-error").textContent = res.message;
+      }
+    }
+  };
+
+  xhr.send();
+}
+
+function postMessage() {
+  let content = document.getElementById('post-content').value;
+  if (content) {
+    let email = localStorage.getItem("email");
+    let dataObject = {
+        email: email,
+        message, content
+    }
+
+    let token = localStorage.getItem("token");
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", url + "/post_message", true);
+    xhr.setRequestHeader("Authorization", token);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4) {
+        let res = JSON.parse(xhr.responseText);
+        if (res.success) {
+            loadMessages();
+        } else {
+            document.getElementById("post-error").textContent = res.message;
+        }
+      }
+    };
+    let req = JSON.stringify(dataObject);
+    xhr.send(req);
+  }
+}
+
+function postOthersMessage() {
+  let token = localStorage.getItem("token");
+  let content = document.getElementById('other-post-content').value;
+
+  if (content) {
+    let email = document.getElementById('search-field').value;
+    let dataObject = {
+      email: email,
+      message: content
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", url + "/post_message", true);
+    xhr.setRequestHeader("Authorization", token);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4) {
+        let res = JSON.parse(xhr.responseText);
+        if (res.success) {
+            loadOtherMessages();
+        } else {
+            document.getElementById("search-error").textContent = res.message;
+        }
+      }
+    };
+    let req = JSON.stringify(dataObject);
+    xhr.send(req);
+  }
 }
