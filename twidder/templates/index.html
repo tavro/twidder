@@ -25,7 +25,7 @@
                     <p><i><span id="user-info-city"></span><span id="user-info-country"></span></i></p>
                 </div>
                 <form id="post-form" method="post" onsubmit="postMessage(event)">
-                    <textarea id="post-content" name="post-content" rows="4"></textarea><br><br>
+                    <textarea id="post-content" name="post-content" rows="4" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br><br>
                     <div class="center">
                         <button type="submit">Post</button>
                     </div>
@@ -48,7 +48,7 @@
                         <p><i><span id="other-user-info-city"></span><span id="other-user-info-country"></span></i></p>
                     </div>
                     <form id="other-post-form" method="post" onsubmit="postOthersMessage(event)">
-                        <textarea id="other-post-content" name="other-post-content" rows="4"></textarea><br><br>
+                        <textarea id="other-post-content" name="other-post-content" rows="4" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br><br>
                         <div class="center">
                             <button type="submit">Post</button>
                         </div>

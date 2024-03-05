@@ -40,6 +40,10 @@ function updatePosts(data) {
         
     data.forEach(function(obj) {
         var div = document.createElement('div');
+
+        div.setAttribute('draggable', true); // LAB4
+        div.setAttribute('ondragstart', 'drag(event)');
+
         div.textContent = obj;
         postWrapper.appendChild(div);
     });
@@ -51,6 +55,10 @@ function updateOtherPosts(data) {
 
     data.forEach(function(obj) {
         var div = document.createElement('div');
+
+        div.setAttribute('draggable', true); // LAB4
+        div.setAttribute('ondragstart', 'drag(event)');
+
         div.textContent = obj;
         postWrapper.appendChild(div);
     });
@@ -391,4 +399,24 @@ function postOthersMessage(event) {
     let req = JSON.stringify(dataObject);
     xhr.send(req);
   }
+}
+
+/*
+
+LAB4 below
+
+*/
+
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.textContent);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  ev.target.value += data;
 }
