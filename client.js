@@ -21,10 +21,12 @@ document.addEventListener('submit', function (e) {
                 var res = serverstub.signUp(dataObject);
                 if(res.success) {
                     serverstub.signIn(document.getElementById("email2").value, document.getElementById("password2").value)
-                    displayView('profileview');
-                    loadUserData();
-                    updatePosts();
-                    showPanel('home');
+                    document.getElementById("signup-error").textContent = "Signed up successfully";
+                    
+                    //displayView('profileview');
+                    //loadUserData();
+                    //updatePosts();
+                    //showPanel('home');
                 }
                 else {
                     document.getElementById("signup-error").textContent = res.message;
@@ -77,6 +79,7 @@ document.addEventListener('submit', function (e) {
                 document.getElementById('search-content-wrapper').style.display = "block";
                 document.getElementById("search-error").textContent = "";
                 displayOtherUserData(res.data);
+                updateOtherPosts();
             } else {
                 document.getElementById('search-content-wrapper').style.display = "none";
                 document.getElementById("search-error").textContent = res.message;
@@ -163,6 +166,9 @@ function changePasswordForm(event) {
 
     if (!result.success) {
         document.getElementById("change-password-error").textContent = result.message;
+    }
+    else {
+        document.getElementById("change-password-error").textContent = "Password changed successfully";
     }
 }
 

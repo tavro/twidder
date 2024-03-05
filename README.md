@@ -81,3 +81,7 @@ Rules:
 - [ ] Use of HTML5 for Drag and Drop
 - [ ] Applying Further Security Measures
 - [ ] Third-Party Authentication Using OpenID/OAuth 2.0
+
+
+# FIX:
+- [ ] Reload messages on browse

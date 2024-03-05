@@ -33,6 +33,7 @@ class FlaskAppTests(unittest.TestCase):
                 'city': 'Test City',
                 'country': 'Test Country'
             }
+
             try:
                 response = requests.post(url, json=data)
                 response.raise_for_status()

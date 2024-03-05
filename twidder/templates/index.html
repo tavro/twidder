@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}My Website{% endblock %}</title>
+    <title>{% block title %}Twidder{% endblock %}</title>
     <link href="/static/client.css" rel="stylesheet">
 </head>
 <body>
@@ -19,7 +19,7 @@
                     <p>Account</p>
                 </div>
             </div>
-        
+
             <div id="home-wrapper" class="panel">
                 <div id="user-info-wrapper">
                     <p><b><span id="user-info-fname"></span> <span id="user-info-lname"></span> <span id="user-info-mail"></span></b></p>
@@ -80,7 +80,7 @@
                         </div>
                     </form>
                     <p class="error-text" id="change-password-error"></p>
-                    <button onclick="signOut()">Sign Out</button>
+                    <button onclick="logout()">Sign Out</button>
                     <p class="error-text" id="signout-error"></p>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                 <div class="forms-wrapper">
                     <div class="login-wrapper">
                         <h1 id="login-header">Login</h1>
-                        <form id="login-form" action="/sign-in" method="post">
+                        <form id="login-form" method="post">
                             <div class="form-group">
                                 <label for="email">Email</label>
                                 <input type="email" id="email" name="email" required>
@@ -111,7 +111,7 @@
                     </div>
                     <div class="signup-wrapper">
                         <h1 id="signup-header">Signup</h1>
-                        <form id="signup-form" action="/sign-up" method="post">
+                        <form id="signup-form" method="post">
                             <div class="form-group">
                                 <label for="first_name">First Name</label>
                                 <input type="text" id="first_name" name="first_name" required>
@@ -141,7 +141,7 @@
                                 <label for="country">Country</label>
                                 <input type="text" id="country" name="country">
                             </div>
-        
+    
                             <div class="form-group">
                                 <label for="email2">Email</label>
                                 <input type="email" id="email2" name="email" required>
@@ -161,51 +161,6 @@
                                 <button type="submit">Sign Up</button>
                             </div>
                         </form>
-                        <script>
-                            document.getElementById('login-form').onsubmit = function(e) {
-                                e.preventDefault();
-                                var formData = {
-                                    email: document.getElementById('email').value,
-                                    password: document.getElementById('password').value,
-                                };
-                                fetch('/sign-in', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify(formData),
-                                })
-                                .then(response => response.json())
-                                .then(data => alert(data.message))
-                                .catch((error) => {
-                                    console.error('Error:', error);
-                                });
-                            };
-                            document.getElementById('signup-form').onsubmit = function(e) {
-                                e.preventDefault();
-                                var formData = {
-                                    first_name: document.getElementById('first_name').value,
-                                    family_name: document.getElementById('family_name').value,
-                                    city: document.getElementById('city').value,
-                                    country: document.getElementById('country').value,
-                                    email: document.getElementById('email2').value,
-                                    password: document.getElementById('password2').value,
-                                    repeat_password: document.getElementById('repeat_password').value
-                                };
-                                fetch('/sign-up', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify(formData),
-                                })
-                                .then(response => response.json())
-                                .then(data => alert(data.message))
-                                .catch((error) => {
-                                    console.error('Error:', error);
-                                });
-                            };
-                        </script>
                         <p class="error-text" id="signup-error"></p>
                     </div>
                 </div>
@@ -213,6 +168,6 @@
         </div>
         {% endif %}
     </main>
-    <!--<script src="/static/client.js"></script>-->
+    <script src="/static/client.js"></script>
 </body>
 </html>
