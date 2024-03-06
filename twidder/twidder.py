@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify, render_template, session
 from flask_sock import Sock
+
+from Crypto.Hash import HMAC, SHA256
+
 import database_helper
 import secrets
 import hashlib
@@ -9,6 +12,7 @@ import re
 app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_here'
 
+SECRET_KEY = b'very_secret_key'
 
 sock = Sock(app)
 socks = {}
@@ -20,6 +24,19 @@ def check_logout(sock):
         token = sock.receive()
         if database_helper.check_token(token):
             socks[token] = sock
+
+
+def generate_hmac_signature(data):
+    hmac = HMAC.new(SECRET_KEY, digestmod=SHA256)
+    hmac.update(data.encode())
+    return hmac.hexdigest()
+
+
+def verify_hmac_signature(request):
+    received_signature = request.headers.get('X-HMAC-Signature')
+    data = request.get_data(as_text=True)
+    expected_signature = generate_hmac_signature(data)
+    return received_signature == expected_signature
 
 
 def make_res(status, rescode, msg, data="-"):
@@ -57,6 +74,9 @@ def validate_token(token):
 
 @app.route("/sign_in", methods=["POST"])
 def sign_in():
+    if not verify_hmac_signature(request):
+        return make_res(False, 403, "Invalid HMAC signature")
+    
     email = request.get_json().get('username')
     password = request.get_json().get('password')
 
@@ -81,6 +101,9 @@ def sign_in():
 
 @app.route('/sign_up', methods=['POST'])
 def sign_up():
+    if not verify_hmac_signature(request):
+        return make_res(False, 403, "Invalid HMAC signature")
+    
     data = request.get_json()
 
     email = data.get("email")
@@ -129,6 +152,9 @@ def sign_out():
 
 @app.route('/change_password', methods=['PUT'])
 def change_password():
+    if not verify_hmac_signature(request):
+        return make_res(False, 403, "Invalid HMAC signature")
+    
     token = request.headers.get('Authorization')
 
     old_password = request.get_json().get('oldpassword')
@@ -225,6 +251,9 @@ def get_user_messages_by_email(email):
 
 @app.route('/post_message', methods=['POST'])
 def post_message():
+    if not verify_hmac_signature(request):
+        return make_res(False, 403, "Invalid HMAC signature")
+    
     token = request.headers.get('Authorization')
 
     message = request.get_json().get('message')

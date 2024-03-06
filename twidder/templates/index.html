@@ -156,21 +156,7 @@
             </div>
         </div>
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script src="/static/client.js"></script>
-    <script>
-        window.onload = function () {
-            const welcomeView = document.getElementById('welcomeview');
-            const profileView = document.getElementById('profileview');
-
-            if (localStorage.getItem("token")) {
-                loadUser();
-                welcomeView.style.display = 'none';
-                profileView.style.display = 'block';
-            } else {
-                welcomeView.style.display = 'block';
-                profileView.style.display = 'none';
-            }
-        };
-    </script>
 </body>
 </html>

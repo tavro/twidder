@@ -139,6 +139,9 @@ function register(event) {
   xhr.open("POST", url + "/sign_up", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
+  const hmacSignature = generateHMAC(dataObject);
+  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
@@ -171,6 +174,9 @@ function login(event) {
   let xhr = new XMLHttpRequest();
   xhr.open("POST", url + "/sign_in", true);
   xhr.setRequestHeader("Content-Type", "application/json");
+
+  const hmacSignature = generateHMAC(dataObject);
+  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
@@ -209,6 +215,9 @@ function changePassword(event) {
   xhr.open("PUT", url + "/change_password", true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.setRequestHeader("Authorization", token);
+
+  const hmacSignature = generateHMAC(dataObject);
+  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
@@ -353,6 +362,9 @@ function postMessage(event) {
     xhr.setRequestHeader("Authorization", token);
     xhr.setRequestHeader("Content-Type", "application/json");
 
+    const hmacSignature = generateHMAC(dataObject);
+    xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+
     xhr.onreadystatechange = function () {
       if (xhr.readyState == 4) {
         let res = JSON.parse(xhr.responseText);
@@ -385,6 +397,9 @@ function postOthersMessage(event) {
     xhr.open("POST", url + "/post_message", true);
     xhr.setRequestHeader("Authorization", token);
     xhr.setRequestHeader("Content-Type", "application/json");
+
+    const hmacSignature = generateHMAC(dataObject);
+    xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState == 4) {
@@ -419,4 +434,11 @@ function drop(ev) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
   ev.target.value += data;
+}
+
+const secretKey = "very_secret_key"
+function generateHMAC(dataObject) {
+  const message = JSON.stringify(dataObject);
+  const signature = CryptoJS.HmacSHA256(message, secretKey);
+  return signature.toString(CryptoJS.enc.Hex);
 }
