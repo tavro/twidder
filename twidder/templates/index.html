@@ -26,6 +26,7 @@
                 </div>
                 <form id="post-form" method="post" onsubmit="postMessage(event)">
                     <textarea id="post-content" name="post-content" rows="4" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br><br>
+                    <input type="file" id="media-input" accept="image/*,video/*,audio/*">
                     <div class="center">
                         <button type="submit">Post</button>
                     </div>
@@ -49,6 +50,7 @@
                     </div>
                     <form id="other-post-form" method="post" onsubmit="postOthersMessage(event)">
                         <textarea id="other-post-content" name="other-post-content" rows="4" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br><br>
+                        <input type="file" id="other-media-input" accept="image/*,video/*,audio/*">
                         <div class="center">
                             <button type="submit">Post</button>
                         </div>

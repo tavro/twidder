@@ -3,6 +3,9 @@ from flask_sock import Sock
 
 from Crypto.Hash import HMAC, SHA256
 
+import base64
+import json
+
 import database_helper
 import secrets
 import hashlib
@@ -275,6 +278,23 @@ def post_message():
     if not database_helper.user_exists(recipient_email):
         return make_res(False, 400, "Recipient email not found")
 
-    database_helper.store_message(sender_email, message, recipient_email)
+    message_id = database_helper.store_message(sender_email, message, recipient_email)
+
+    # LAB4 stuff
+    data = request.get_json()
+    media_base64 = data.get('media')
+    media_type = data.get('media_type')
+
+    if media_base64 and media_type:
+        base64_data = media_base64.split(",")[-1]
+        
+        try:
+            media_data = base64.b64decode(base64_data)
+            success = database_helper.add_media_to_message(message_id, media_type, media_data)
+            if not success:
+                return make_res(False, 500, "Failed to store media")
+        except base64.binascii.Error as error:
+            return make_res(False, 400, "Invalid media format")
+
     return make_res(True, 201, "Message sent successfully")
 

@@ -35,33 +35,79 @@ function displayOtherUserData(data) {
 }
 
 function updatePosts(data) {
-    var postWrapper = document.querySelector('.posts-wrapper');
-    postWrapper.innerHTML = '';
-        
-    data.forEach(function(obj) {
-        var div = document.createElement('div');
+  var postWrapper = document.querySelector('.posts-wrapper');
+  postWrapper.innerHTML = '';
+      
+  data.forEach(function(obj) {
+      var div = document.createElement('div');
+      var mediaContent = document.createElement('div');
 
-        div.setAttribute('draggable', true); // LAB4
-        div.setAttribute('ondragstart', 'drag(event)');
+      div.setAttribute('draggable', true); // LAB4
+      div.setAttribute('ondragstart', 'drag(event)');
 
-        div.textContent = obj;
-        postWrapper.appendChild(div);
-    });
+      div.textContent = obj.message;
+
+      obj.media.forEach(function(media) {
+          if (media.media_type.startsWith('image/')) {
+              var img = document.createElement('img');
+              img.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              img.style.maxWidth = '200px';
+              mediaContent.appendChild(img);
+          } else if (media.media_type.startsWith('audio/')) {
+              var audio = document.createElement('audio');
+              audio.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              audio.controls = true;
+              mediaContent.appendChild(audio);
+          } else if (media.media_type.startsWith('video/')) {
+              var video = document.createElement('video');
+              video.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              video.controls = true;
+              video.style.maxWidth = '300px';
+              mediaContent.appendChild(video);
+          }
+      });
+
+      div.appendChild(mediaContent);
+      postWrapper.appendChild(div);
+  });
 }
 
 function updateOtherPosts(data) {
-    var postWrapper = document.querySelector('.other-posts-wrapper');
-    postWrapper.innerHTML = '';
+  var postWrapper = document.querySelector('.other-posts-wrapper');
+  postWrapper.innerHTML = '';
+      
+  data.forEach(function(obj) {
+      var div = document.createElement('div');
+      var mediaContent = document.createElement('div');
 
-    data.forEach(function(obj) {
-        var div = document.createElement('div');
+      div.setAttribute('draggable', true); // LAB4
+      div.setAttribute('ondragstart', 'drag(event)');
 
-        div.setAttribute('draggable', true); // LAB4
-        div.setAttribute('ondragstart', 'drag(event)');
+      div.textContent = obj.message;
 
-        div.textContent = obj;
-        postWrapper.appendChild(div);
-    });
+      obj.media.forEach(function(media) {
+          if (media.media_type.startsWith('image/')) {
+              var img = document.createElement('img');
+              img.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              img.style.maxWidth = '200px';
+              mediaContent.appendChild(img);
+          } else if (media.media_type.startsWith('audio/')) {
+              var audio = document.createElement('audio');
+              audio.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              audio.controls = true;
+              mediaContent.appendChild(audio);
+          } else if (media.media_type.startsWith('video/')) {
+              var video = document.createElement('video');
+              video.src = 'data:' + media.media_type + ';base64,' + media.media_data;
+              video.controls = true;
+              video.style.maxWidth = '300px';
+              mediaContent.appendChild(video);
+          }
+      });
+
+      div.appendChild(mediaContent);
+      postWrapper.appendChild(div);
+  });
 }
 
 function showPanel(panelId) {
@@ -349,34 +395,80 @@ function postMessage(event) {
   event.preventDefault();
 
   let content = document.getElementById('post-content').value;
-  if (content) {
-    let email = localStorage.getItem("email");
-    let dataObject = {
-        email: email,
-        message: content
-    }
+  
+  let mediaInput = document.getElementById('media-input');
+  let file = mediaInput.files[0];
+  let reader = new FileReader();
 
-    let token = localStorage.getItem("token");
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", url + "/post_message", true);
-    xhr.setRequestHeader("Authorization", token);
-    xhr.setRequestHeader("Content-Type", "application/json");
+  reader.onload = function(e) {
+    if (content) {
+      let email = localStorage.getItem("email");
+      let mediaType = file.type;
 
-    const hmacSignature = generateHMAC(dataObject);
-    xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState == 4) {
-        let res = JSON.parse(xhr.responseText);
-        if (res.success) {
-            loadMessages();
-        } else {
-            document.getElementById("post-error").textContent = res.message;
-        }
+      let dataObject = {
+          email: email,
+          message: content,
+          media: e.target.result,
+          media_type: mediaType
       }
-    };
-    let req = JSON.stringify(dataObject);
-    xhr.send(req);
+
+      let token = localStorage.getItem("token");
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url + "/post_message", true);
+      xhr.setRequestHeader("Authorization", token);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      const hmacSignature = generateHMAC(dataObject);
+      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+          let res = JSON.parse(xhr.responseText);
+          if (res.success) {
+              loadMessages();
+          } else {
+              document.getElementById("post-error").textContent = res.message;
+          }
+        }
+      };
+      let req = JSON.stringify(dataObject);
+      xhr.send(req);
+    }
+  }
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+  else {
+    if (content) {
+      let email = localStorage.getItem("email");
+      let dataObject = {
+          email: email,
+          message: content
+      }
+
+      let token = localStorage.getItem("token");
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url + "/post_message", true);
+      xhr.setRequestHeader("Authorization", token);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      const hmacSignature = generateHMAC(dataObject);
+      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+          let res = JSON.parse(xhr.responseText);
+          if (res.success) {
+              loadMessages();
+          } else {
+              document.getElementById("post-error").textContent = res.message;
+          }
+        }
+      };
+      let req = JSON.stringify(dataObject);
+      xhr.send(req);
+    }
   }
 }
 
@@ -386,33 +478,76 @@ function postOthersMessage(event) {
   let token = localStorage.getItem("token");
   let content = document.getElementById('other-post-content').value;
 
-  if (content) {
-    let email = document.getElementById('search-field').value;
-    let dataObject = {
-      email: email,
-      message: content
-    }
+  let mediaInput = document.getElementById('other-media-input');
+  let file = mediaInput.files[0];
+  let reader = new FileReader();
 
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", url + "/post_message", true);
-    xhr.setRequestHeader("Authorization", token);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    const hmacSignature = generateHMAC(dataObject);
-    xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState == 4) {
-        let res = JSON.parse(xhr.responseText);
-        if (res.success) {
-            loadOtherMessages();
-        } else {
-            document.getElementById("search-error").textContent = res.message;
-        }
+  reader.onload = function(e) {
+    if (content) {
+      let email = document.getElementById('search-field').value;
+      let mediaType = file.type;
+      let dataObject = {
+        email: email,
+        message: content,
+        media: e.target.result,
+        media_type: mediaType
       }
-    };
-    let req = JSON.stringify(dataObject);
-    xhr.send(req);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url + "/post_message", true);
+      xhr.setRequestHeader("Authorization", token);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      const hmacSignature = generateHMAC(dataObject);
+      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+          let res = JSON.parse(xhr.responseText);
+          if (res.success) {
+              loadOtherMessages();
+          } else {
+              document.getElementById("search-error").textContent = res.message;
+          }
+        }
+      };
+      let req = JSON.stringify(dataObject);
+      xhr.send(req);
+    }
+  }
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+  else {
+    if (content) {
+      let email = document.getElementById('search-field').value;
+      let dataObject = {
+        email: email,
+        message: content,
+      }
+  
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url + "/post_message", true);
+      xhr.setRequestHeader("Authorization", token);
+      xhr.setRequestHeader("Content-Type", "application/json");
+  
+      const hmacSignature = generateHMAC(dataObject);
+      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+  
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+          let res = JSON.parse(xhr.responseText);
+          if (res.success) {
+              loadOtherMessages();
+          } else {
+              document.getElementById("search-error").textContent = res.message;
+          }
+        }
+      };
+      let req = JSON.stringify(dataObject);
+      xhr.send(req);
+    }
   }
 }
 
