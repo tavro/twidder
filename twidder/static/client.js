@@ -185,22 +185,40 @@ function register(event) {
   xhr.open("POST", url + "/sign_up", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
-  const hmacSignature = generateHMAC(dataObject);
-  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
-
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
       let token = xhr.getResponseHeader("Authorization");
+      
+      const rescodelookup = {
+        201: {
+          'created': 'The user was successfully created'
+        },
+        400: {
+          'bad_request1': 'Field is missing',
+          'bad_request2': 'Invalid email adress',
+          'bad_request3': 'Password must be at least 8 characters'
+        },
+        409: {
+          'user_exists': 'The user already exists'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'An error occurred during sign-up'
+        }
+      }
+      
       if (res.success) {
         if(token) {
             localStorage.setItem("token", token);
             updateViews();
         }
-        initSocket(); // TODO: Check if working
-        document.getElementById("signup-error").textContent = res.message;
+        initSocket();
+        document.getElementById("signup-error").textContent = rescodelookup[res.code][res.message];
       } else {
-        document.getElementById("signup-error").textContent = res.message;
+        document.getElementById("signup-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -221,13 +239,29 @@ function login(event) {
   xhr.open("POST", url + "/sign_in", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
-  const hmacSignature = generateHMAC(dataObject);
-  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
-
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
       let token = res.data;
+
+      const rescodelookup = {
+        200: {
+          'ok': 'Signed in successfully'
+        },
+        400: {
+          'bad_request': 'Missing username or password'
+        },
+        401: {
+          'unauthorized': 'Invalid username or password'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         if(token) {
             localStorage.setItem("token", token);
@@ -235,10 +269,10 @@ function login(event) {
             showPanel('home');
             updateViews();
         }
-        initSocket(); // TODO: Check if working
-        document.getElementById("login-error").textContent = res.message;
+        initSocket();
+        document.getElementById("login-error").textContent = rescodelookup[res.code][res.message];
       } else {
-        document.getElementById("login-error").textContent = res.message;
+        document.getElementById("login-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -262,16 +296,39 @@ function changePassword(event) {
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.setRequestHeader("Authorization", token);
 
-  const hmacSignature = generateHMAC(dataObject);
-  xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+  const { signature, timestamp } = generateSignature(dataObject, token);
+  xhr.setRequestHeader("X-Signature", signature);
+  xhr.setRequestHeader("X-Timestamp", timestamp);
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok': 'Password changed successfully'
+        },
+        400: {
+          'bad_request1': 'Empty field',
+          'bad_request2': 'User not found',
+          'bad_request3': 'Password must be at least 8 characters'
+        },
+        401: {
+          'unauthorized1': 'Invalid token',
+          'unauthorized2': 'Incorrect old password'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
-        document.getElementById("change-password-error").textContent = res.message;
+        document.getElementById("change-password-error").textContent = rescodelookup[res.code][res.message];
       } else {
-        document.getElementById("change-password-error").textContent = res.message;
+        document.getElementById("change-password-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -289,6 +346,25 @@ function logout() {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok': 'Signed out successfully'
+        },
+        400: {
+          'bad_request': 'Field is missing'
+        },
+        401: {
+          'unauthorized': 'Invalid token'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         localStorage.removeItem("token");
         updateViews();
@@ -296,7 +372,7 @@ function logout() {
           socket.close();
         }
       } else {
-        document.getElementById("signout-error").textContent = res.message;
+        document.getElementById("signout-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -314,10 +390,27 @@ function loadUser() {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok': 'Loaded profile successfully'
+        },
+        401: {
+          'unauthorized1': 'Invalid token',
+          'unauthorized2': 'No user data found'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         displayUserData(res.data);
       } else {
-            document.getElementById("post-error").textContent = res.message;
+            document.getElementById("post-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -335,10 +428,27 @@ function loadMessages() {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok1': 'Loaded messages successfully',
+          'ok2': 'No messages yet'
+        },
+        401: {
+          'unauthorized': 'Invalid token'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         updatePosts(res.data);
       } else {
-        document.getElementById("post-error").textContent = res.message;
+        document.getElementById("post-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -357,10 +467,27 @@ function loadOtherMessages() {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok1': 'Loaded messages successfully',
+          'ok2': 'No messages yet'
+        },
+        401: {
+          'unauthorized': 'Invalid token'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         updateOtherPosts(res.data);
       } else {
-        document.getElementById("search-error").textContent = res.message;
+        document.getElementById("search-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -380,10 +507,29 @@ function searchUser(event) {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == 4) {
       let res = JSON.parse(xhr.responseText);
+
+      const rescodelookup = {
+        200: {
+          'ok': 'User was found'
+        },
+        401: {
+          'unauthorized': 'Invalid token'
+        },
+        404: {
+          'not_found': 'Email not found'
+        },
+        405: {
+          'not_allowed': 'You are not allowed to use this method for this request'
+        },
+        500: {
+          'server_error': 'Internal server error'
+        }
+      }
+
       if (res.success) {
         displayOtherUserData(res.data);
       } else {
-        document.getElementById("search-error").textContent = res.message;
+        document.getElementById("search-error").textContent = rescodelookup[res.code][res.message];
       }
     }
   };
@@ -393,6 +539,27 @@ function searchUser(event) {
 
 function postMessage(event) {
   event.preventDefault();
+
+  const rescodelookup = {
+    201: {
+      'ok': 'Message sent successfully'
+    },
+    401: {
+      'unauthorized': 'Invalid token'
+    },
+    400: {
+      'bad_request1': 'Empty field',
+      'bad_request2': 'Empty message',
+      'bad_request3': 'Recipient email not found',
+      'bad_request4': 'Invalid media format'
+    },
+    405: {
+      'not_allowed': 'You are not allowed to use this method for this request'
+    },
+    500: {
+      'server_error': 'Failed to store media'
+    }
+  }
 
   let content = document.getElementById('post-content').value;
   
@@ -418,8 +585,9 @@ function postMessage(event) {
       xhr.setRequestHeader("Authorization", token);
       xhr.setRequestHeader("Content-Type", "application/json");
 
-      const hmacSignature = generateHMAC(dataObject);
-      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+      const { signature, timestamp } = generateSignature(dataObject, token);
+      xhr.setRequestHeader("X-Signature", signature);
+      xhr.setRequestHeader("X-Timestamp", timestamp);
 
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -427,7 +595,7 @@ function postMessage(event) {
           if (res.success) {
               loadMessages();
           } else {
-              document.getElementById("post-error").textContent = res.message;
+              document.getElementById("post-error").textContent = rescodelookup[res.code][res.message];
           }
         }
       };
@@ -453,8 +621,9 @@ function postMessage(event) {
       xhr.setRequestHeader("Authorization", token);
       xhr.setRequestHeader("Content-Type", "application/json");
 
-      const hmacSignature = generateHMAC(dataObject);
-      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+      const { signature, timestamp } = generateSignature(dataObject, token);
+      xhr.setRequestHeader("X-Signature", signature);
+      xhr.setRequestHeader("X-Timestamp", timestamp);
 
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -462,7 +631,7 @@ function postMessage(event) {
           if (res.success) {
               loadMessages();
           } else {
-              document.getElementById("post-error").textContent = res.message;
+              document.getElementById("post-error").textContent = rescodelookup[res.code][res.message];
           }
         }
       };
@@ -474,6 +643,27 @@ function postMessage(event) {
 
 function postOthersMessage(event) {
   event.preventDefault();
+
+  const rescodelookup = {
+    201: {
+      'ok': 'Message sent successfully'
+    },
+    401: {
+      'unauthorized': 'Invalid token'
+    },
+    400: {
+      'bad_request1': 'Empty field',
+      'bad_request2': 'Empty message',
+      'bad_request3': 'Recipient email not found',
+      'bad_request4': 'Invalid media format'
+    },
+    405: {
+      'not_allowed': 'You are not allowed to use this method for this request'
+    },
+    500: {
+      'server_error': 'Failed to store media'
+    }
+  }
 
   let token = localStorage.getItem("token");
   let content = document.getElementById('other-post-content').value;
@@ -498,8 +688,9 @@ function postOthersMessage(event) {
       xhr.setRequestHeader("Authorization", token);
       xhr.setRequestHeader("Content-Type", "application/json");
 
-      const hmacSignature = generateHMAC(dataObject);
-      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+      const { signature, timestamp } = generateSignature(dataObject, token);
+      xhr.setRequestHeader("X-Signature", signature);
+      xhr.setRequestHeader("X-Timestamp", timestamp);
 
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -507,7 +698,7 @@ function postOthersMessage(event) {
           if (res.success) {
               loadOtherMessages();
           } else {
-              document.getElementById("search-error").textContent = res.message;
+              document.getElementById("search-error").textContent = rescodelookup[res.code][res.message];
           }
         }
       };
@@ -532,8 +723,9 @@ function postOthersMessage(event) {
       xhr.setRequestHeader("Authorization", token);
       xhr.setRequestHeader("Content-Type", "application/json");
   
-      const hmacSignature = generateHMAC(dataObject);
-      xhr.setRequestHeader("X-HMAC-Signature", hmacSignature);
+      const { signature, timestamp } = generateSignature(dataObject, token);
+      xhr.setRequestHeader("X-Signature", signature);
+      xhr.setRequestHeader("X-Timestamp", timestamp);
   
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -541,7 +733,7 @@ function postOthersMessage(event) {
           if (res.success) {
               loadOtherMessages();
           } else {
-              document.getElementById("search-error").textContent = res.message;
+              document.getElementById("search-error").textContent = rescodelookup[res.code][res.message];
           }
         }
       };
@@ -571,9 +763,13 @@ function drop(ev) {
   ev.target.value += data;
 }
 
-const secretKey = "very_secret_key"
-function generateHMAC(dataObject) {
-  const message = JSON.stringify(dataObject);
-  const signature = CryptoJS.HmacSHA256(message, secretKey);
-  return signature.toString(CryptoJS.enc.Hex);
+function generateSignature(dataObject, token) {
+  const timestamp = new Date().toISOString();
+  const dataWithPublicInfo = {...dataObject, timestamp};
+  const serializedData = JSON.stringify(dataWithPublicInfo);
+  
+  const dataToSign = serializedData + token;
+  const signature = CryptoJS.SHA256(dataToSign).toString(CryptoJS.enc.Hex);
+
+  return { signature, timestamp };
 }
